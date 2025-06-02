@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         DEPLOY_USER = 'iis_user'              
-        DEPLOY_HOST = '192.168.43.50'          
+        DEPLOY_HOST = '192.168.10.2'          
         DEPLOY_PATH = '/c/inetpub/wwwroot'    
     }
 
