@@ -2,45 +2,39 @@ pipeline {
     agent any
 
     environment {
-        // Adresse SSH de ton serveur de déploiement
-        DEPLOY_USER = 'michel-nyembo'
-        DEPLOY_HOST = '192.168.10.10'
-        DEPLOY_PATH = '/home/michel-nyembo/Documents/site_apashe'
+        DEPLOY_DIR = "/home/michel-nyembo/Documents/site_apashe"
     }
 
     stages {
         stage('Checkout') {
             steps {
-                // Récupérer le code source depuis GitHub
-                git branch: 'main', url: 'https://github.com/MichelNyembo/jenkins.git'
+                git url: 'https://github.com/MichelNyembo/jenkins.git', branch: 'main'
             }
         }
 
         stage('Build') {
             steps {
-                // Ici tu peux ajouter des commandes de build si nécessaire
-                // Par exemple, npm install, npm run build, etc.
-                echo "Build étape (si nécessaire)"
+                echo 'Build étape (si nécessaire)'
             }
         }
 
         stage('Deploy') {
             steps {
-                // Copier les fichiers vers le serveur (avec SCP par exemple)
-                // Nécessite que Jenkins ait une clé SSH configurée pour le serveur
-                sh """
-                scp -r * ${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_PATH}
-                """
+                sh '''
+                    echo "Déploiement local vers $DEPLOY_DIR"
+                    mkdir -p "$DEPLOY_DIR"
+                    cp -r Jenkinsfile index.html script.js styles.css "$DEPLOY_DIR"
+                '''
             }
         }
     }
 
     post {
-        success {
-            echo "Déploiement réussi !"
-        }
         failure {
-            echo "Le déploiement a échoué."
+            echo 'Le déploiement a échoué.'
+        }
+        success {
+            echo 'Le déploiement a réussi.'
         }
     }
 }
