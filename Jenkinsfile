@@ -15,6 +15,7 @@ pipeline {
         stage('Build') {
             steps {
                 echo 'Build étape (si nécessaire)'
+                // Ajoute ici tes commandes de build si tu en as (npm build, make, etc.)
             }
         }
 
@@ -23,7 +24,8 @@ pipeline {
                 sh '''
                     echo "Déploiement local vers $DEPLOY_DIR"
                     mkdir -p "$DEPLOY_DIR"
-                    cp -r Jenkinsfile index.html script.js styles.css "$DEPLOY_DIR"
+                    # Copier tout sauf .git et dossiers inutiles
+                    rsync -av --exclude='.git' --exclude='README.md' ./ "$DEPLOY_DIR"
                 '''
             }
         }
