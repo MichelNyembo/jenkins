@@ -14,33 +14,36 @@ pipeline {
 
         stage('Build') {
             steps {
-                echo 'Build étape (si nécessaire)'
-                // Ajoute ici tes commandes de build si tu en as (npm build, make, etc.)
+                echo 'Étape build (si nécessaire)'
+            }
+        }
+
+        stage('Lint & Test') {
+            steps {
+                sh '''
+                  echo "🔍 Vérification de la syntaxe"
+                  npm install
+                  npx eslint **/*.js
+                  npx stylelint "**/*.css"
+                  npx htmlhint "**/*.html"
+                '''
             }
         }
 
         stage('Deploy') {
             steps {
                 sh '''
-                    echo "Déploiement local vers $DEPLOY_DIR"
-                    # Supprimer tout dans le dossier de déploiement (attention à bien cibler le bon dossier)
-                    rm -rf "$DEPLOY_DIR"/*
-                    # Recréer le dossier au cas où (mkdir -p gère déjà ça, mais c'est une précaution)
-                    mkdir -p "$DEPLOY_DIR"
-                    # Copier tout le contenu du workspace vers le dossier de déploiement
-                    rsync -av --exclude='.git' ./ "$DEPLOY_DIR"
+                  echo "🚀 Déploiement vers $DEPLOY_DIR"
+                  rm -rf "$DEPLOY_DIR"/*
+                  mkdir -p "$DEPLOY_DIR"
+                  rsync -av --exclude='.git' ./ "$DEPLOY_DIR"
                 '''
             }
         }
-
     }
 
     post {
-        failure {
-            echo 'Le déploiement a échoué.'
-        }
-        success {
-            echo 'Le déploiement a réussi.'
-        }
+        success { echo 'Déploiement terminé avec succès ! 🎉' }
+        failure { echo '🔴 Build ou tests échoués, pas de déploiement.' }
     }
 }
