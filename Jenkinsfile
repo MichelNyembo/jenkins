@@ -23,12 +23,16 @@ pipeline {
             steps {
                 sh '''
                     echo "Déploiement local vers $DEPLOY_DIR"
+                    # Supprimer tout dans le dossier de déploiement (attention à bien cibler le bon dossier)
+                    rm -rf "$DEPLOY_DIR"/*
+                    # Recréer le dossier au cas où (mkdir -p gère déjà ça, mais c'est une précaution)
                     mkdir -p "$DEPLOY_DIR"
-                    # Copier tout sauf .git et dossiers inutiles
-                    rsync -av --exclude='.git' --exclude='README.md' ./ "$DEPLOY_DIR"
+                    # Copier tout le contenu du workspace vers le dossier de déploiement
+                    rsync -av --exclude='.git' ./ "$DEPLOY_DIR"
                 '''
             }
         }
+
     }
 
     post {
